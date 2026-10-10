@@ -18,8 +18,6 @@
 !                       Turing()
 !
 !         Variables:    board[3,3]
-!                       r,c
-!                       rows, cols  (both set to 3)
 !                       x,y         (for user input)
 !                       victor      (determines victor of match)
 !                       counter     (keeps track of turns)
@@ -34,21 +32,12 @@ program tictactran
   ! main board array
   character, dimension(3,3) :: board = '_'
 
-  integer :: r,c
-  integer :: rows = 3, cols = 3
-  ! integer :: vRows = 24, vCols = 3
   integer :: x, y
   integer :: victor = 0
   integer :: counter = 0
   integer :: diff = 0
-
-  ! integer, dimension(24,3) :: vBoard
   character(len=3) :: retire = 'no'
   character(len=16) :: arg
-  ! call BoardLoader(r,c,vRows,vCols,vBoard)
-
-
-
 
   ! "tictac --version" prints the version and exits
   call get_command_argument(1, arg)
@@ -61,7 +50,7 @@ program tictactran
   call random_init(.false., .false.)
   call Menu(diff, VERSION)
   do while (retire .ne. 'yes' .and. victor .eq. 0)
-    call PrintBoard(board, rows, cols, r, c)
+    call PrintBoard(board)
 
     call GetPos(x,y, counter, retire, board)
     if (retire .ne. 'yes') then
@@ -70,10 +59,10 @@ program tictactran
         call Sonny(board, diff)
       else
         call MarkBoard(x,y,board)
-        call VCheck(board, rows, cols, victor)
+        call VCheck(board, victor)
         if ( victor .eq. 0 ) then
           call Sonny(board, diff)
-          call VCheck(board, rows, cols, victor)
+          call VCheck(board, victor)
         end if
       end if
     end if
@@ -118,16 +107,13 @@ subroutine Menu(diff, ver)
 end subroutine menu
 
 ! Subroutine to print tic-tac-toe board
-subroutine PrintBoard(board, rows, cols, r, c)
+subroutine PrintBoard(board)
   character, dimension(3,3) :: board
-  integer :: r,c
-  integer :: rows, cols
-  r = 1
-  c = 1
+  integer :: r, c
   write(*,*)
-  do r = 1, rows
+  do r = 1, 3
     write(*,2)
-    write(*,1) (board(r,c), c = 1, cols)
+    write(*,1) (board(r,c), c = 1, 3)
     write(*,2)
   end do
   write(*,*)
@@ -216,24 +202,25 @@ subroutine EndOfInput()
   stop
 end subroutine EndOfInput
 
-    ! Indented Subroutine to quit
-    subroutine OAP()
-      write(*,*) 'Quitting program...'
-      call Turing()
-    end subroutine OAP
+! Subroutine to quit when the user retires
+subroutine OAP()
+  write(*,*) 'Quitting program...'
+  call Turing()
+end subroutine OAP
 
-    subroutine OverLaid(tX, tY, b)
-      integer :: tX, tY
-      character, dimension(3,3) :: b
-      if ( b(tX,tY) .eq. "X" ) then
-        write(*,*) "You've already got an 'X' there mate!"
-        write(*,*)
-      else
-        write(*,*) "You can't go where the AI has gone before..."
-        write(*,*)
-      end if
+! Subroutine to explain why the chosen cell is taken
+subroutine OverLaid(tX, tY, b)
+  integer :: tX, tY
+  character, dimension(3,3) :: b
+  if ( b(tX,tY) .eq. "X" ) then
+    write(*,*) "You've already got an 'X' there mate!"
+    write(*,*)
+  else
+    write(*,*) "You can't go where the AI has gone before..."
+    write(*,*)
+  end if
+end subroutine OverLaid
 
-    end subroutine OverLaid
 ! Subroutine to mark board for User
 subroutine MarkBoard(x,y,b)
   integer :: x,y
@@ -291,8 +278,8 @@ subroutine ScanLine(b, i, mark, n, ey, ez)
   character :: mark
   integer :: i, n, ey, ez, k
   integer, dimension(3,8) :: lr, lc
-  data lr /1,1,1, 2,2,2, 3,3,3, 1,2,3, 1,2,3, 1,2,3,                         1,2,3, 1,2,3/
-  data lc /1,2,3, 1,2,3, 1,2,3, 1,1,1, 2,2,2, 3,3,3,                         1,2,3, 3,2,1/
+  data lr /1,1,1, 2,2,2, 3,3,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3/
+  data lc /1,2,3, 1,2,3, 1,2,3, 1,1,1, 2,2,2, 3,3,3, 1,2,3, 3,2,1/
   n = 0
   ey = 0
   ez = 0
@@ -399,80 +386,19 @@ recursive integer function Score(b, mark) result(best)
   if ( .not. moved ) best = 0
 end function Score
 
-! Subroutine to check for Victory for either player
-subroutine VCheck(b, rows, cols, victor)
+! Subroutine to set victor: 1 user (X) won, 2 computer (O) won, 3 tie
+subroutine VCheck(b, victor)
   character, dimension(3,3) :: b
-  integer :: r, c
-  integer :: rows, cols
   integer :: victor
-  logical :: tie
-  integer :: vReturn
-  ! check horizontal conditions
-
-
-  do r = 1, rows
-    c = 1
-    if (b(r,c) .ne. "_") then
-      if ( b(r,c) .eq. b(r,c+1) .and. b(r,c) .eq. b(r,c+2) ) then
-        victor = VReturn(b,r,c)
-      end if
-    end if
-  end do
-  ! check vertical conditions
-  do c = 1, cols
-    r = 1
-    if (b(r,c) .ne. "_") then
-      if (b(r,c) .eq. b(r+1,c) .and. b(r,c) .eq. b(r+2,c)) then
-        victor = VReturn(b,r,c)
-      end if
-    end if
-  end do
-  ! czech diagonals
-  ! check downward diagonal
-  r = 1
-  c = 1
-
-  if (b(r,c) .ne. "_") then
-    if (b(r,c) .eq. b(r+1,c+1) .and. b(r,c) .eq. b(r+2,c+2)) then
-      victor = VReturn(b,r,c)
-    end if
-  end if
-  ! check upward diagonal
-  if (b(r+2,c) .ne. "_") then
-    if (b(r+2,c) .eq. b(r+1,c+1) .and. b(r,c+2) .eq. b(r+2,c))then
-      victor = VReturn(b, r+2, c)
-    end if
-  end if
-
-
-  if ( victor .eq. 0 ) then
-    tie = .true.
-    do r = 1, rows
-      do c = 1, cols
-        if ( b(r,c) .eq. "_" ) then
-
-          tie = .false.
-        end if
-      end do
-    end do
-    if ( tie .eqv. .true. ) then
-
-      victor = 3
-    end if
+  logical :: Wins
+  if ( Wins(b, "X") ) then
+    victor = 1
+  else if ( Wins(b, "O") ) then
+    victor = 2
+  else if ( all(b .ne. "_") ) then
+    victor = 3
   end if
 end subroutine VCheck
-
-! Function to return who the victor is
-integer function VReturn(b,r,c)
-  character, dimension(3,3) :: b
-  integer :: r, c
-
-  if (b(r,c) .eq. "X") then
-    vReturn = 1
-  else if (b(r,c) .eq. "O") then
-    vReturn = 2
-  end if
-end function vReturn
 
 
 subroutine Turing()

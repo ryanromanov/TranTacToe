@@ -38,12 +38,12 @@ The main program loops until the user retires or `victor` is non-zero:
 
 - Board is `character board(3,3)`, empty cells are `'_'`. User input `x y` maps to `board(x,y)` i.e. **x = row, y = column**.
 - Read numbers through `ReadInt` / `ReadPair`, never a bare `read(*,*)`: they re-prompt on non-numeric input and call `EndOfInput` (clean quit) when stdin ends.
-- `victor` codes: `0` none, `1` user (X), `2` computer (O), `3` tie. `VCheck` sets it via the `VReturn` function.
+- `victor` codes: `0` none, `1` user (X), `2` computer (O), `3` tie. `VCheck` sets it from `Wins`.
 - `Sonny` is the AI, with one block per difficulty (comments quote Asimov's Three Laws):
   - `diff == 1`: random empty cell.
   - `diff == 2`: completes its own line, else blocks the user's (`FindLine`), else random.
   - `diff == 3`: full minimax search (`BestMove` → recursive `Score`); deterministic and unbeatable.
-  - The 8 winning lines live in one table in `ScanLine`; `FindLine` and `Wins` are built on it. `VCheck` still has its own separate line checks.
+  - The 8 winning lines live in one table in `ScanLine`; `FindLine`, `Wins` and `VCheck` are built on it.
   - `Sonny` assumes at least one empty cell; the main loop only calls it while `victor == 0`.
-- Subroutines take array/dimension arguments explicitly (no modules); names are referenced implicitly, so signature changes must be updated at every call site manually.
+- Subroutines take the board as an explicit `character b(3,3)` argument (no modules); names are referenced implicitly, so signature changes must be updated at every call site manually.
 - Only the main program has `implicit none`. Inside subroutines, a function such as `Wins` or `Score` must be declared with its type in every caller (`logical :: Wins`), or it is implicitly typed `real`.
