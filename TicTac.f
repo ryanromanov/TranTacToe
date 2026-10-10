@@ -156,11 +156,9 @@ c          print*, '//', tempX, tempY
                 y = tempY
                 c = c + 1
               else
-                do while (b(tempX,tempY) .ne. "_")
                 call OverLaid(tempX, tempY, b)
                 write(*,*) 'Please re-enter your x- and y-coordinates:'
                 read(*,*) tempX,tempY
-                end do
               end if
             else
               write(*,*) 'Error: your y-coordinates are wrong'
@@ -173,6 +171,9 @@ c          print*, '//', tempX, tempY
             read(*,*) ret
             if ( ret .eq. 'yes' ) then
               call OAP()
+            else
+              write(*,*) 'Please enter your x- and y-coordinates:'
+              read(*,*) tempX,tempY
             end if
           else
             write(*,*) 'Error: your x-coordinates are wrong'
