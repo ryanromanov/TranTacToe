@@ -57,3 +57,7 @@ python3 tests/test_game.py
 
 The tests build the game and play it through stdin, including every possible
 game against difficulty 3. CI runs them on every pull request.
+
+## License
+
+[MIT](LICENSE) © 2017–2026 Ryan Romanosky
