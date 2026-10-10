@@ -67,12 +67,12 @@ c   Seed the random number generator once, differently on each run
           if (retire .ne. 'yes') then
             if (counter .lt. 3) then
               call MarkBoard(x,y,board)
-              call Sonny(board, rows, cols,diff)
+              call Sonny(board, diff)
             else
               call MarkBoard(x,y,board)
               call VCheck(board, rows, cols, victor)
               if ( victor .eq. 0 ) then
-                call Sonny(board, rows, cols,diff)
+                call Sonny(board, diff)
                 call VCheck(board, rows, cols, victor)
               end if
             end if
@@ -217,10 +217,9 @@ c Subroutine to mark board for User
 
 
 c   "The Three Laws will lead to only one logical outcome."
-      subroutine Sonny(b, rows, cols, diff)
+      subroutine Sonny(b, diff)
         character, dimension(3,3) :: b
         integer :: y,z
-        integer :: rows, cols
         integer :: diff
         real :: rando
         logical :: found
