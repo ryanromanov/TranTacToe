@@ -14,7 +14,7 @@ gfortran TicTac.f -o tictac   # fixed-form source (.f); needs gfortran 9+ for ra
 ```
 
 ```sh
-python3 tests/test_game.py                                  # build with -Wall -fcheck=all, run all tests
+python3 tests/test_game.py                                  # build (warnings are errors), run all tests
 python3 tests/test_game.py Input.test_declining_retire_resumes_game   # one test
 ```
 
