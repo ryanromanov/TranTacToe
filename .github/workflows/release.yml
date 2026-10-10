@@ -51,7 +51,7 @@ jobs:
         run: |
           gfortran -O2 ${{ matrix.ldflags }} TicTac.f90 -o tictac
           ./tictac --version
-          tar -czf ${{ matrix.asset }}.tar.gz tictac
+          tar -czf ${{ matrix.asset }}.tar.gz tictac LICENSE
 
       - uses: actions/upload-artifact@v4
         with:
