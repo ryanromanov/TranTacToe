@@ -63,7 +63,6 @@ c        call BoardLoader(r,c,vRows,vCols,vBoard)
             else
               call MarkBoard(x,y,board)
               call VCheck(board, rows, cols, victor)
-              print*, 'Victor: ', victor
               if ( victor .eq. 0 ) then
                 call Sonny(board, rows, cols,diff)
                 call VCheck(board, rows, cols, victor)
@@ -148,7 +147,6 @@ c Subroutine to get User coördinates
         write(*,*) '( To retire, enter 0 0 )'
         read(*,*) tempX,tempY
         do while ((x .eq. 0 .or. y .eq. 0) .and. ret .ne. 'yes' )
-c          print*, '//', tempX, tempY
           if ( tempX .gt. 0 .and. tempX .lt. 4 ) then
             if ( tempY .gt. 0 .and. tempY .lt. 4 ) then
               if (b(tempX, tempY) .eq. "_") then
@@ -181,10 +179,6 @@ c          print*, '//', tempX, tempY
             read(*,*) tempX,tempY
           end if
         end do
-        write(*,3) 'x,y =', x,y
-        write(*,4) 'counter =', c
-  3   format(' ', A,X,I1,',',I1)
-  4   format(' ', A,X,I2)
       end subroutine GetPos
 c Indented Subroutine to quit
           subroutine OAP()
@@ -432,22 +426,17 @@ c     check upward diagonal
 
         if ( victor .eq. 0 ) then
           tie = .true.
-          print*, 'Tie check'
           do r = 1, rows
             do c = 1, cols
-              print*, 'Board: ', b(r,c)
               if ( b(r,c) .eq. "_" ) then
 
                 tie = .false.
-                print*, 'Tie is false', tie
               end if
             end do
           end do
-          print*, 'Tie: ', tie
           if ( tie .eqv. .true. ) then
 
             victor = 3
-            print*, 'Victor is', victor
           end if
         end if
       end subroutine VCheck
@@ -472,7 +461,6 @@ c Function to return who the victor is
 
         call random_number(temp)
         coin = int(temp*10)+1
-        print*, 'Coin: ', coin
         if (coin .lt. 3) then
           write(*,*)
           write(*,*)
