@@ -9,7 +9,7 @@ Tic-Tac-Tran: a terminal tic-tac-toe game written in Fortran. The human plays `X
 ## Build & run
 
 ```sh
-gfortran TicTac.f -o tictac   # fixed-form source (.f); needs gfortran 9+ for random_init
+gfortran TicTac.f90 -o tictac   # needs gfortran 9+ for random_init
 ./tictac
 ```
 
@@ -18,20 +18,20 @@ python3 tests/test_game.py                                  # build (warnings ar
 python3 tests/test_game.py Input.test_declining_retire_resumes_game   # one test
 ```
 
-The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any code line past column 72. Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence.
+The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any line over 132 characters (the standard free-form limit). Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence.
 
 ## Versioning & releases
 
-The version lives in one place: `VERSION` in the main program of `TicTac.f` (semver, e.g. `0.2.0`). `./tictac --version` prints it and the welcome banner shows it.
+The version lives in one place: `VERSION` in the main program of `TicTac.f90` (semver, e.g. `0.2.0`). `./tictac --version` prints it and the welcome banner shows it.
 
 To release: bump `VERSION` in a PR and merge it, then tag that commit on `master`: `git tag v0.3.0 && git push origin v0.3.0`. `.github/workflows/release.yml` re-runs the tests, fails if the tag doesn't equal `v` + `VERSION`, builds Linux x86_64 (fully static) and macOS arm64 (static libgfortran/libgcc/libquadmath) binaries, and publishes a GitHub Release with notes generated from merged PRs. PRs that edit `release.yml` run the build jobs without publishing.
 
 ## Source layout
 
-- `TicTac.f` — the whole game. **Fixed-form Fortran**: code starts at column 7, `c` in column 1 is a comment, continuation lines have `+` in column 6, and anything past column 72 is ignored. Keep long string literals split with `+` continuations as the existing code does.
-- `ticTakScratch.f` — scratch/experimental `BoardLoader` subroutine (a 24×3 win-pattern table) written in **free-form** despite the `.f` extension; it only compiles with `gfortran -ffree-form`. It is not linked into the game; the call to it in `TicTac.f` is commented out.
+- `TicTac.f90` — the whole game, free-form Fortran (`!` comments, `&` at line end to continue). Split long messages with `"..." // &` so lines stay within 132 characters.
+- `ticTakScratch.f90` — scratch/experimental `BoardLoader` subroutine (a 24×3 win-pattern table). It is not linked into the game; the call to it in `TicTac.f90` is commented out.
 
-## Architecture (TicTac.f)
+## Architecture (TicTac.f90)
 
 The main program loops until the user retires or `victor` is non-zero:
 `Menu` (pick difficulty 1–3) → loop { `PrintBoard` → `GetPos` (read/validate user move, increments turn `counter`) → `MarkBoard` → `VCheck` (only once `counter >= 3`) → `Sonny` (computer move) → `VCheck` } → end message + `Turing` (random quote).

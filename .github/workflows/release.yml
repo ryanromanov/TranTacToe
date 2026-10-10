@@ -40,16 +40,16 @@ jobs:
       - name: Check tag matches VERSION
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          gfortran TicTac.f -o tictac-check
+          gfortran TicTac.f90 -o tictac-check
           version="$(./tictac-check --version)"
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION $version in TicTac.f"
+            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION $version in TicTac.f90"
             exit 1
           fi
 
       - name: Build release binary
         run: |
-          gfortran -O2 ${{ matrix.ldflags }} TicTac.f -o tictac
+          gfortran -O2 ${{ matrix.ldflags }} TicTac.f90 -o tictac
           ./tictac --version
           tar -czf ${{ matrix.asset }}.tar.gz tictac
 
