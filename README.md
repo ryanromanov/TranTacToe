@@ -51,8 +51,8 @@ gfortran TicTac.f90 -o tictac
 1. Choose a difficulty:
    - **1 (greenhorn):** the computer plays at random.
    - **2 (leftenant):** it completes its own lines and blocks yours.
-   - **3 (Navy Seal Copy Pasta):** it plays perfectly. The best you can do is
-     a tie.
+   - **3 (Navy Seal Copy Pasta):** it plays perfectly and sets traps. The best
+     you can do is a tie.
 2. Enter each move as `row column`, separated by a space. Rows and columns are
    numbered 1–3 from the top-left corner, so `1 3` is the top-right cell.
 3. To give up, enter `0 0` and confirm with `yes`.
