@@ -1,4 +1,4 @@
-"""End-to-end tests for TicTac.f: build it, then drive the game over stdin.
+"""End-to-end tests for TicTac.f90: build it, then drive the game over stdin.
 
 Run with: python3 tests/test_game.py
 """
@@ -10,7 +10,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SOURCE = os.path.join(ROOT, "TicTac.f")
+SOURCE = os.path.join(ROOT, "TicTac.f90")
 ALL_CELLS = [(r, c) for r in range(1, 4) for c in range(1, 4)]
 RETIRE = [(0, 0)]
 TIMEOUT = 5
@@ -59,12 +59,13 @@ def last_board(out):
 
 
 class SourceFormat(unittest.TestCase):
-    def test_no_code_past_column_72(self):
-        # Fixed-form Fortran silently drops anything past column 72.
+    def test_lines_fit_standard_free_form_limit(self):
+        # The standard caps free-form lines at 132 characters; gfortran 16
+        # accepts longer ones, but other compilers reject them.
         with open(SOURCE) as f:
             long_lines = [
                 i for i, line in enumerate(f, 1)
-                if len(line.rstrip("\n")) > 72 and line[:1] not in "cC!"
+                if len(line.rstrip("\n")) > 132
             ]
         self.assertEqual(long_lines, [])
 
