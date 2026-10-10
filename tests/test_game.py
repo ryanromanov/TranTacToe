@@ -96,6 +96,28 @@ class Input(unittest.TestCase):
         self.assertEqual(outcome, "quit")
         self.assertEqual(last_board(out)[0][0], "X")
 
+    def test_letters_at_difficulty_prompt(self):
+        p = subprocess.run(
+            [BIN], input="abc\n1\n0 0\nyes\n", capture_output=True,
+            text=True, timeout=TIMEOUT,
+        )
+        self.assertIn("please enter a whole number", p.stdout)
+        self.assertIn("Quitting program", p.stdout)
+        self.assertNotIn("Fortran runtime error", p.stdout + p.stderr)
+
+    def test_letters_at_move_prompt(self):
+        outcome, out = play(1, [], "a b\n1 x\n2 2\n0 0\nyes\n")
+        self.assertEqual(outcome, "quit")
+        self.assertEqual(out.count("please enter two whole numbers"), 2)
+        self.assertEqual(last_board(out)[1][1], "X")
+
+    def test_end_of_input_quits_cleanly(self):
+        for extra in ("", "0 0\n"):  # at the move prompt, at the retire prompt
+            with self.subTest(extra=extra):
+                outcome, out = play(1, [], extra)
+                self.assertEqual(outcome, "quit")
+                self.assertIn("No more input", out)
+
     def test_out_of_range_after_occupied_cell(self):
         outcome, out = play(1, [(1, 1), (1, 1), (5, 5)] + RETIRE, "yes\n")
         self.assertEqual(outcome, "quit")
