@@ -1,0 +1,2 @@
+# gfortran writes the module interface (game.mod) next to the build
+*.mod

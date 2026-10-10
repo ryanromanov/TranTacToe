@@ -6,89 +6,18 @@
 !
 !
 !	**********************************************************************
-!-----------------------------------------------------------------------
-!     Begin Program / Declare Variables
-!       Uses:
-!         Subroutines:  Menu()
-!                       PrintBoard()
-!                       GetPos()
-!                       MarkBoard()
-!                       Sonny()
-!                       VCheck()
-!                       Turing()
-!
-!         Variables:    board[3,3]
-!                       x,y         (for user input)
-!                       victor      (determines victor of match)
-!                       counter     (keeps track of turns)
-!                       diff        (difficulty setting)
-!                       retire      (used to quit program)
-!                       VERSION     (release version, see CLAUDE.md)
-!-----------------------------------------------------------------------
-program tictactran
+
+! All of the game's subroutines and functions. In a module, every call is
+! checked against the routine's interface, and implicit none makes every
+! variable need a declaration.
+module game
   implicit none
-  ! Release version; must match the git tag (vX.Y.Z) when releasing
-  character(len=*), parameter :: VERSION = '0.2.1'
-  ! main board array
-  character, dimension(3,3) :: board = '_'
-
-  integer :: x, y
-  integer :: victor = 0
-  integer :: counter = 0
-  integer :: diff = 0
-  character(len=3) :: retire = 'no'
-  character(len=16) :: arg
-
-  ! "tictac --version" prints the version and exits
-  call get_command_argument(1, arg)
-  if ( arg .eq. '--version' ) then
-    write(*,'(A)') VERSION
-    stop
-  end if
-
-  ! Seed the random number generator once, differently on each run
-  call random_init(.false., .false.)
-  call Menu(diff, VERSION)
-  do while (retire .ne. 'yes' .and. victor .eq. 0)
-    call PrintBoard(board)
-
-    call GetPos(x,y, counter, retire, board)
-    if (retire .ne. 'yes') then
-      if (counter .lt. 3) then
-        call MarkBoard(x,y,board)
-        call Sonny(board, diff)
-      else
-        call MarkBoard(x,y,board)
-        call VCheck(board, victor)
-        if ( victor .eq. 0 ) then
-          call Sonny(board, diff)
-          call VCheck(board, victor)
-        end if
-      end if
-    end if
-
-
-  end do
-
-  if ( victor .eq. 1 ) then
-    write(*,*) "Congratulations! You've beaten the computer!"
-    call Turing()
-  else if (victor .eq. 2) then
-    write(*,*) "Congratulations! You've been beaten by the computer"
-    call Turing()
-  else if (victor .eq. 3) then
-    write(*,*) 'The tie goes to the mortal man.'
-    call Turing()
-  end if
-
-end program tictactran
-
-
+contains
 
 ! Subroutine for Menu display & gets difficulty level
 subroutine Menu(diff, ver)
-  integer :: diff
-  character(len=*) :: ver
+  integer, intent(out) :: diff
+  character(len=*), intent(in) :: ver
   write(*,*) "Welcome to Tic-Tac-Tran! (v", ver, ")"
   write(*,*) "This Fortran-based emulator is the most accurate and "
   write(*,*) "graphically advanced way to play the game known for its ability " // &
@@ -108,7 +37,7 @@ end subroutine menu
 
 ! Subroutine to print tic-tac-toe board
 subroutine PrintBoard(board)
-  character, dimension(3,3) :: board
+  character, dimension(3,3), intent(in) :: board
   integer :: r, c
   write(*,*)
   do r = 1, 3
@@ -123,10 +52,11 @@ end subroutine PrintBoard
 
 ! Subroutine to get User coördinates
 subroutine GetPos(x,y,c, ret,b)
-  integer :: x,y, c
-  character, dimension(3,3) :: b
+  integer, intent(out) :: x,y
+  integer, intent(inout) :: c
+  character, dimension(3,3), intent(in) :: b
   integer :: tempX, tempY
-  character(len=3) :: ret
+  character(len=3), intent(inout) :: ret
   integer :: ios
   tempX = -1
   tempY = -1
@@ -175,7 +105,8 @@ subroutine GetPos(x,y,c, ret,b)
 end subroutine GetPos
 ! Subroutine to read one integer, re-asking until the input is a number
 subroutine ReadInt(n)
-  integer :: n, ios
+  integer, intent(out) :: n
+  integer :: ios
   read(*,*,iostat=ios) n
   do while (ios .ne. 0)
     if ( ios .lt. 0 ) call EndOfInput()
@@ -186,7 +117,8 @@ end subroutine ReadInt
 
 ! Subroutine to read two integers, re-asking until both are numbers
 subroutine ReadPair(a, b)
-  integer :: a, b, ios
+  integer, intent(out) :: a, b
+  integer :: ios
   read(*,*,iostat=ios) a, b
   do while (ios .ne. 0)
     if ( ios .lt. 0 ) call EndOfInput()
@@ -210,8 +142,8 @@ end subroutine OAP
 
 ! Subroutine to explain why the chosen cell is taken
 subroutine OverLaid(tX, tY, b)
-  integer :: tX, tY
-  character, dimension(3,3) :: b
+  integer, intent(in) :: tX, tY
+  character, dimension(3,3), intent(in) :: b
   if ( b(tX,tY) .eq. "X" ) then
     write(*,*) "You've already got an 'X' there mate!"
     write(*,*)
@@ -223,18 +155,17 @@ end subroutine OverLaid
 
 ! Subroutine to mark board for User
 subroutine MarkBoard(x,y,b)
-  integer :: x,y
-  character, dimension(3,3) :: b
+  integer, intent(in) :: x,y
+  character, dimension(3,3), intent(inout) :: b
 
   b(x,y) = "X"
 end subroutine MarkBoard
 
-
 ! "The Three Laws will lead to only one logical outcome."
 subroutine Sonny(b, diff)
-  character, dimension(3,3) :: b
+  character, dimension(3,3), intent(inout) :: b
   integer :: y,z
-  integer :: diff
+  integer, intent(in) :: diff
   real :: rando
   logical :: found
 
@@ -274,9 +205,11 @@ end subroutine Sonny
 ! n:     how many of its cells hold mark
 ! ey,ez: one of its empty cells, or 0,0 if it has none
 subroutine ScanLine(b, i, mark, n, ey, ez)
-  character, dimension(3,3) :: b
-  character :: mark
-  integer :: i, n, ey, ez, k
+  character, dimension(3,3), intent(in) :: b
+  character, intent(in) :: mark
+  integer, intent(in) :: i
+  integer, intent(out) :: n, ey, ez
+  integer :: k
   integer, dimension(3,8) :: lr, lc
   data lr /1,1,1, 2,2,2, 3,3,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3/
   data lc /1,2,3, 1,2,3, 1,2,3, 1,1,1, 2,2,2, 3,3,3, 1,2,3, 3,2,1/
@@ -294,10 +227,11 @@ end subroutine ScanLine
 
 ! Subroutine to find a line with two of mark and one empty cell (y,z)
 subroutine FindLine(b, mark, y, z, found)
-  character, dimension(3,3) :: b
-  character :: mark
-  integer :: y, z, i, n, ey, ez
-  logical :: found
+  character, dimension(3,3), intent(in) :: b
+  character, intent(in) :: mark
+  integer, intent(out) :: y, z
+  logical, intent(out) :: found
+  integer :: i, n, ey, ez
   found = .false.
   do i = 1, 8
     call ScanLine(b, i, mark, n, ey, ez)
@@ -312,8 +246,8 @@ end subroutine FindLine
 
 ! Function to check whether mark holds a complete line
 logical function Wins(b, mark)
-  character, dimension(3,3) :: b
-  character :: mark
+  character, dimension(3,3), intent(in) :: b
+  character, intent(in) :: mark
   integer :: i, n, ey, ez
   Wins = .false.
   do i = 1, 8
@@ -324,10 +258,10 @@ end function Wins
 
 ! Subroutine to pick the computer's best cell (y,z) by minimax
 subroutine BestMove(b, y, z)
-  character, dimension(3,3) :: b
-  integer :: y, z, r, c, s, best
+  character, dimension(3,3), intent(inout) :: b
+  integer, intent(out) :: y, z
+  integer :: r, c, s, best
   logical :: found
-  integer :: Score
   ! Take an immediate win rather than any equally-scored slower one
   call FindLine(b, "O", y, z, found)
   if ( found ) return
@@ -350,11 +284,11 @@ end subroutine BestMove
 
 ! Function to score board b with mark to move: 1 O wins, -1 X wins, 0 tie
 recursive integer function Score(b, mark) result(best)
-  character, dimension(3,3) :: b
-  character :: mark, other
+  character, dimension(3,3), intent(inout) :: b
+  character, intent(in) :: mark
+  character :: other
   integer :: r, c, s
   logical :: moved
-  logical :: Wins
   if ( Wins(b, "O") ) then
     best = 1
     return
@@ -388,9 +322,8 @@ end function Score
 
 ! Subroutine to set victor: 1 user (X) won, 2 computer (O) won, 3 tie
 subroutine VCheck(b, victor)
-  character, dimension(3,3) :: b
-  integer :: victor
-  logical :: Wins
+  character, dimension(3,3), intent(in) :: b
+  integer, intent(inout) :: victor
   if ( Wins(b, "X") ) then
     victor = 1
   else if ( Wins(b, "O") ) then
@@ -400,11 +333,9 @@ subroutine VCheck(b, victor)
   end if
 end subroutine VCheck
 
-
 subroutine Turing()
   integer :: coin
   real :: temp
-
 
   call random_number(temp)
   coin = int(temp*10)+1
@@ -463,3 +394,82 @@ subroutine Turing()
     write(*,*)
   end if
 end subroutine Turing
+
+end module game
+
+!-----------------------------------------------------------------------
+!     Begin Program / Declare Variables
+!       Uses:
+!         Subroutines:  Menu()
+!                       PrintBoard()
+!                       GetPos()
+!                       MarkBoard()
+!                       Sonny()
+!                       VCheck()
+!                       Turing()
+!
+!         Variables:    board[3,3]
+!                       x,y         (for user input)
+!                       victor      (determines victor of match)
+!                       counter     (keeps track of turns)
+!                       diff        (difficulty setting)
+!                       retire      (used to quit program)
+!                       VERSION     (release version, see CLAUDE.md)
+!-----------------------------------------------------------------------
+program tictactran
+  use game
+  implicit none
+  ! Release version; must match the git tag (vX.Y.Z) when releasing
+  character(len=*), parameter :: VERSION = '0.2.1'
+  ! main board array
+  character, dimension(3,3) :: board = '_'
+
+  integer :: x, y
+  integer :: victor = 0
+  integer :: counter = 0
+  integer :: diff = 0
+  character(len=3) :: retire = 'no'
+  character(len=16) :: arg
+
+  ! "tictac --version" prints the version and exits
+  call get_command_argument(1, arg)
+  if ( arg .eq. '--version' ) then
+    write(*,'(A)') VERSION
+    stop
+  end if
+
+  ! Seed the random number generator once, differently on each run
+  call random_init(.false., .false.)
+  call Menu(diff, VERSION)
+  do while (retire .ne. 'yes' .and. victor .eq. 0)
+    call PrintBoard(board)
+
+    call GetPos(x,y, counter, retire, board)
+    if (retire .ne. 'yes') then
+      if (counter .lt. 3) then
+        call MarkBoard(x,y,board)
+        call Sonny(board, diff)
+      else
+        call MarkBoard(x,y,board)
+        call VCheck(board, victor)
+        if ( victor .eq. 0 ) then
+          call Sonny(board, diff)
+          call VCheck(board, victor)
+        end if
+      end if
+    end if
+
+  end do
+
+  if ( victor .eq. 1 ) then
+    write(*,*) "Congratulations! You've beaten the computer!"
+    call Turing()
+  else if (victor .eq. 2) then
+    write(*,*) "Congratulations! You've been beaten by the computer"
+    call Turing()
+  else if (victor .eq. 3) then
+    write(*,*) 'The tie goes to the mortal man.'
+    call Turing()
+  end if
+
+end program tictactran

@@ -23,7 +23,7 @@ def setUpModule():
     BIN = os.path.join(_tmp, "tictac")
     subprocess.run(
         ["gfortran", "-Wall", "-Wextra", "-Werror", "-fcheck=all",
-         SOURCE, "-o", BIN], check=True
+         "-J", _tmp, SOURCE, "-o", BIN], check=True  # -J: game.mod goes in _tmp
     )
 
 
