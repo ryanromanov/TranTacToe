@@ -30,7 +30,7 @@
 program tictactran
   implicit none
   ! Release version; must match the git tag (vX.Y.Z) when releasing
-  character(len=*), parameter :: VERSION = '0.2.0'
+  character(len=*), parameter :: VERSION = '0.2.1'
   ! main board array
   character, dimension(3,3) :: board = '_'
 
