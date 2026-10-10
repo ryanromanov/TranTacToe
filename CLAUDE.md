@@ -9,7 +9,7 @@ Tic-Tac-Tran: a terminal tic-tac-toe game written in Fortran. The human plays `X
 ## Build & run
 
 ```sh
-gfortran TicTac.f90 -o tictac   # needs gfortran 9+ for random_init
+gfortran TicTac.f90 -o tictac   # needs gfortran 9+ for random_init; also writes game.mod (gitignored)
 ./tictac
 ```
 
@@ -28,7 +28,7 @@ To release: bump `VERSION` in a PR and merge it, then tag that commit on `master
 
 ## Source layout
 
-- `TicTac.f90` — the whole game, free-form Fortran (`!` comments, `&` at line end to continue). Split long messages with `"..." // &` so lines stay within 132 characters.
+- `TicTac.f90` — the whole game, free-form Fortran (`!` comments, `&` at line end to continue): `module game` with every subroutine and function, then the main program, which must come after the module it `use`s. Split long messages with `"..." // &` so lines stay within 132 characters.
 - `docs/history/board-loader.md` — the original 2017 scratch `BoardLoader` code, kept for history. It is not part of the build.
 
 ## Architecture (TicTac.f90)
@@ -45,5 +45,5 @@ The main program loops until the user retires or `victor` is non-zero:
   - `diff == 3`: full minimax search (`BestMove` → recursive `Score`); deterministic and unbeatable.
   - The 8 winning lines live in one table in `ScanLine`; `FindLine`, `Wins` and `VCheck` are built on it.
   - `Sonny` assumes at least one empty cell; the main loop only calls it while `victor == 0`.
-- Subroutines take the board as an explicit `character b(3,3)` argument (no modules); names are referenced implicitly, so signature changes must be updated at every call site manually.
-- Only the main program has `implicit none`. Inside subroutines, a function such as `Wins` or `Score` must be declared with its type in every caller (`logical :: Wins`), or it is implicitly typed `real`.
+- Subroutines take the board as an explicit `character b(3,3)` argument, and every dummy argument has an `intent`.
+- The module and the program both use `implicit none`, so every variable must be declared. Module procedures already have explicit interfaces: don't redeclare a function's type in a caller (`logical :: Wins` is now an error).
