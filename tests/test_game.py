@@ -22,7 +22,8 @@ def setUpModule():
     _tmp = tempfile.mkdtemp()
     BIN = os.path.join(_tmp, "tictac")
     subprocess.run(
-        ["gfortran", "-Wall", "-fcheck=all", SOURCE, "-o", BIN], check=True
+        ["gfortran", "-Wall", "-Wextra", "-Werror", "-fcheck=all",
+         SOURCE, "-o", BIN], check=True
     )
 
 
