@@ -216,12 +216,11 @@ c Subroutine to mark board for User
 c   "The Three Laws will lead to only one logical outcome."
       subroutine Sonny(b, rows, cols, diff)
         character, dimension(3,3) :: b
-        integer :: y,z, r, c
-        integer :: check
+        integer :: y,z
         integer :: rows, cols
         integer :: diff
         real :: rando
-        integer :: temp
+        logical :: found
         integer :: i_seed
         integer, dimension(:), allocatable :: a_seed
         integer, dimension(1:8) :: dt_seed
@@ -235,217 +234,155 @@ c Stack used to randomly seed the pseudorandom sequence from rand num gen
         call random_seed(put=a_seed)
         deallocate(a_seed)
 
-
-        check = 0
+        found = .false.
 c   "A robot may not harm a human or, by inaction, allow a human being
 c     to come to harm."
-        if ( diff .eq. 1 ) then
-          do while (check .eq. 0)
-
-            call random_number(rando)
-            print*, rando
-            y = int(rando*3)+1
-            call random_number(rando)
-            print*, rando
-            z = int(rando*3)+1
-            if ( b(y,z) .eq. "_" ) then
-              b(y,z) = "O"
-              check = 1
-            end if
-          end do
-        end if
+c   Difficulty 1 plays a random empty cell (the fallback below).
 
 c   "A robot must obey orders given it by human beings except where
 c     such orders would conflict with the first law."
+c   Difficulty 2 completes its own line, else blocks the user's line,
+c     else plays randomly.
         if ( diff .eq. 2 ) then
-          do while (check .eq. 0)
-            call random_number(rando)
-!            temp = int(rando*100)+1
-!            print*, 'Percentage Chance: ', temp
-!
-!            if ( temp .eq. 1) then
-!              do while (check .eq. 0)
-!                call random_number(rando)
-!                print*, rando
-!                y = int(rando*3)+1
-!
-!                call random_number(rando)
-!                print*, rando
-!                z = int(rando*3)+1
-!                if ( b(y,z) .eq. "_" ) then
-!                  b(y,z) = "O"
-c                  check = 1
-c                end if
-c              end do
-
-c            else
-              r = 2
-              c = 2
-c   AI if user has chosen center
-              if (b(r,c) .eq. "X") then
-                do while (check .eq. 0)
-                  if (b(r, c+1) .eq. "X" .and. b(r,c-1) .eq. "_") then
-                      y = r
-                      z = c-1
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r-1,c) .eq. "X" .and. b(r+1,c) .eq. "_")then
-                      y = r+1
-                      z = c
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r,c-1) .eq. "X" .and. b(r,c+1) .eq. "_")then
-                      y = r
-                      z = c+1
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r+1,c) .eq. "X" .and. b(r-1,c) .eq. "_")then
-                      y = r-1
-                      z = c
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r-1,c-1).eq."X" .and. b(r+1,c+1).eq."_")then
-                      y = r+1
-                      z = c+1
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r-1,c+1).eq."X" .and. b(r+1,c-1).eq."_")then
-                      y = r+1
-                      z = c-1
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r+1,c+1).eq."X" .and. b(r-1,c-1).eq."_")then
-                      y = r-1
-                      z = c-1
-                      b(y,z) = "O"
-                      check = 1
-                  else if(b(r+1,c-1).eq."X" .and. b(r-1,c+1).eq."_")then
-                      y = r-1
-                      z = c+1
-                      b(y,z) = "O"
-                      check = 1
-                  else
-                    do while (check .eq. 0)
-                      print*, 'czech for center-chosen non aligned'
-                      call random_number(rando)
-                      y = int(rando*3)+1
-                      call random_number(rando)
-                      z = int(rando*3)+1
-                      print*, 'Board marked: ', y,z
-                      if ( b(y,z) .eq. "_" ) then
-                        b(y,z) = "O"
-                        check = 1
-                      end if
-                    end do
-
-                  end if
-
-                end do
-c AI if user hasn't chosen the center
-              else
-                do while ( check .eq. 0 )
-                  if ( b(1,1) .eq. "X" .and. b(1,2) .eq. "X" .and.
-     +b(1,3) .eq. "_" ) then
-                    b(1,3) = "O"
-                    check = 1
-
-                  else if (b(1,1) .eq. "X" .and. b(2,1) .eq. "X" .and.
-     +b(3,1) .eq. "_") then
-                    b(3,1) = "O"
-                    check = 1
-
-                  else if (b(1,1) .eq. "X" .and. b(3,1) .eq. "X" .and.
-     +b(2,1) .eq. "_") then
-                    b(2,1) = "O"
-                    check = 1
-
-                  else if (b(1,1) .eq. "X" .and. b(1,3) .eq. "X" .and.
-     +b(1,2) .eq. "_") then
-                    b(1,2) = "O"
-                    check = 1
-
-                  else if (b(3,3) .eq. "X" .and. b(3,2) .eq. "X" .and.
-     +b(3,1) .eq. "_") then
-                    b(3,1) = "O"
-                    check = 1
-                  else if (b(3,3) .eq. "X" .and. b(3,1) .eq. "X" .and.
-     +b(3,2) .eq. "_") then
-                    b(3,2) = "O"
-                    check = 1
-                  else if (b(3,3) .eq. "X" .and. b(2,3) .eq. "X" .and.
-     +b(1,3) .eq. "_") then
-                    b(1,3) = "O"
-                    check = 1
-                  else if (b(3,3) .eq. "X" .and. b(1,3) .eq. "X" .and.
-     +b(2,3) .eq. "_") then
-                    b(2,3) = "O"
-                    check = 1
-
-                  else if (b(1,3) .eq. "X" ) then
-                    if ( b(1,2) .eq. "X" .and. b(1,1) .eq. "_" ) then
-                      b(1,1) = "O"
-                      check = 1
-
-                    else if (b(2,3) .eq. "X" .and. b(3,3) .eq. "_") then
-                      b(3,3) = "O"
-                      check = 1
-                    end if
-                  else if (b(3,1) .eq. "X") then
-                    if ( b(3,2) .eq. "X" .and. b(3,3) .eq. "_" ) then
-                      b(3,3) = "O"
-                      check = 1
-                    else if (b(2,1) .eq. "X" .and. b(1,1) .eq. "_") then
-                      b(1,1) = "O"
-                      check = 1
-                    end if
-
-                  else if (b(1,1) .eq. "X" .and. b(3,3) .eq. "X" .and.
-     +b(2,2) .eq. "_") then
-                    b(2,2) = "O"
-                    check = 1
-                  else if (b(1,1) .eq. "X" .and. b(1,2) .eq. "X" .and.
-     +b(3,3) .eq. "_") then
-                    b(3,3) = "O"
-                    check = 1
-                  else if (b(1,3) .eq. "X" .and. b(3,1) .eq. "X" .and.
-     +b(2,2) .eq. "_") then
-                    b(2,2) = "O"
-                  else if (b(1,3) .eq. "X" .and. b(2,2) .eq. "X" .and.
-     +b(3,1) .eq. "_") then
-                    b(3,1) = "O"
-                    check = 1
-                  else if (b(3,3) .eq. "X" .and. b(2,2) .eq. "X" .and.
-     +b(1,1) .eq. "_") then
-                    b(1,1) = "O"
-                    check = 1
-                  else if (b(3,1) .eq. "X" .and. b(2,2) .eq. "X" .and.
-     +b(1,3) .eq. "_") then
-                    b(1,3) = "O"
-                    check = 1
-                  else
-                    do while (check .eq. 0)
-                      call random_number(rando)
-                      y = int(rando*3)+1
-                      z = int(rando*3)+1
-                      if ( b(y,z) .eq. "_" ) then
-                        b(y,z) = "O"
-                        check = 1
-                      end if
-                    end do
-                  end if
-                end do
-              end if
-          end do
+          call FindLine(b, "O", y, z, found)
+          if ( .not. found ) call FindLine(b, "X", y, z, found)
         end if
-
 
 c   "A robot must protect its own existence as long as such
 c     protection does not conflict with the first or second law."
+c   Difficulty 3 searches the full game tree and never loses.
         if ( diff .eq. 3 ) then
-
+          call BestMove(b, y, z)
+          found = .true.
         end if
 
+        do while (.not. found)
+          call random_number(rando)
+          y = int(rando*3)+1
+          call random_number(rando)
+          z = int(rando*3)+1
+          found = b(y,z) .eq. "_"
+        end do
+        b(y,z) = "O"
       end subroutine Sonny
+
+c Subroutine to scan winning line i (1-3 rows, 4-6 cols, 7-8 diagonals)
+c   n:     how many of its cells hold mark
+c   ey,ez: one of its empty cells, or 0,0 if it has none
+      subroutine ScanLine(b, i, mark, n, ey, ez)
+        character, dimension(3,3) :: b
+        character :: mark
+        integer :: i, n, ey, ez, k
+        integer, dimension(3,8) :: lr, lc
+        data lr /1,1,1, 2,2,2, 3,3,3, 1,2,3, 1,2,3, 1,2,3,
+     +           1,2,3, 1,2,3/
+        data lc /1,2,3, 1,2,3, 1,2,3, 1,1,1, 2,2,2, 3,3,3,
+     +           1,2,3, 3,2,1/
+        n = 0
+        ey = 0
+        ez = 0
+        do k = 1, 3
+          if ( b(lr(k,i),lc(k,i)) .eq. mark ) n = n + 1
+          if ( b(lr(k,i),lc(k,i)) .eq. "_" ) then
+            ey = lr(k,i)
+            ez = lc(k,i)
+          end if
+        end do
+      end subroutine ScanLine
+
+c Subroutine to find a line with two of mark and one empty cell (y,z)
+      subroutine FindLine(b, mark, y, z, found)
+        character, dimension(3,3) :: b
+        character :: mark
+        integer :: y, z, i, n, ey, ez
+        logical :: found
+        found = .false.
+        do i = 1, 8
+          call ScanLine(b, i, mark, n, ey, ez)
+          if ( n .eq. 2 .and. ey .ne. 0 ) then
+            y = ey
+            z = ez
+            found = .true.
+            return
+          end if
+        end do
+      end subroutine FindLine
+
+c Function to check whether mark holds a complete line
+      logical function Wins(b, mark)
+        character, dimension(3,3) :: b
+        character :: mark
+        integer :: i, n, ey, ez
+        Wins = .false.
+        do i = 1, 8
+          call ScanLine(b, i, mark, n, ey, ez)
+          if ( n .eq. 3 ) Wins = .true.
+        end do
+      end function Wins
+
+c Subroutine to pick the computer's best cell (y,z) by minimax
+      subroutine BestMove(b, y, z)
+        character, dimension(3,3) :: b
+        integer :: y, z, r, c, s, best
+        logical :: found
+        integer :: Score
+c   Take an immediate win rather than any equally-scored slower one
+        call FindLine(b, "O", y, z, found)
+        if ( found ) return
+        best = -2
+        do r = 1, 3
+          do c = 1, 3
+            if ( b(r,c) .eq. "_" ) then
+              b(r,c) = "O"
+              s = Score(b, "X")
+              b(r,c) = "_"
+              if ( s .gt. best ) then
+                best = s
+                y = r
+                z = c
+              end if
+            end if
+          end do
+        end do
+      end subroutine BestMove
+
+c Function to score board b with mark to move: 1 O wins, -1 X wins, 0 tie
+      recursive integer function Score(b, mark) result(best)
+        character, dimension(3,3) :: b
+        character :: mark, other
+        integer :: r, c, s
+        logical :: moved
+        logical :: Wins
+        if ( Wins(b, "O") ) then
+          best = 1
+          return
+        else if ( Wins(b, "X") ) then
+          best = -1
+          return
+        end if
+
+        if ( mark .eq. "O" ) then
+          best = -2
+          other = "X"
+        else
+          best = 2
+          other = "O"
+        end if
+        moved = .false.
+        do r = 1, 3
+          do c = 1, 3
+            if ( b(r,c) .eq. "_" ) then
+              b(r,c) = mark
+              s = Score(b, other)
+              b(r,c) = "_"
+              moved = .true.
+              if ( mark .eq. "O" ) best = max(best, s)
+              if ( mark .eq. "X" ) best = min(best, s)
+            end if
+          end do
+        end do
+        if ( .not. moved ) best = 0
+      end function Score
 
 c Subroutine to check for Victory for either player
       subroutine VCheck(b, rows, cols, victor)
