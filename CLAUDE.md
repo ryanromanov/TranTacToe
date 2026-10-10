@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Tic-Tac-Tran: a terminal tic-tac-toe game written in Fortran. The human plays `X`, the computer plays `O`. There is no build system, test suite, or linter.
+Tic-Tac-Tran: a terminal tic-tac-toe game written in Fortran. The human plays `X`, the computer plays `O`. There is no build system or linter; CI (`.github/workflows/ci.yml`) runs the end-to-end tests on every PR and push to `master`.
 
 ## Build & run
 
@@ -13,7 +13,12 @@ gfortran TicTac.f -o tictac   # fixed-form source (.f); needs gfortran 9+ for ra
 ./tictac
 ```
 
-The game is interactive (stdin). To smoke-test non-interactively, pipe input: difficulty, then moves as `row col`, e.g. `printf '1\n0 0\nyes\n' | ./tictac` (`0 0` + `yes` retires).
+```sh
+python3 tests/test_game.py                                  # build with -Wall -fcheck=all, run all tests
+python3 tests/test_game.py Input.test_declining_retire_resumes_game   # one test
+```
+
+The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any code line past column 72. Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence.
 
 ## Source layout
 
