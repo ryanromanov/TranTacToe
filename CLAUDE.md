@@ -20,6 +20,12 @@ python3 tests/test_game.py Input.test_declining_retire_resumes_game   # one test
 
 The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any code line past column 72. Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence.
 
+## Versioning & releases
+
+The version lives in one place: `VERSION` in the main program of `TicTac.f` (semver, e.g. `0.2.0`). `./tictac --version` prints it and the welcome banner shows it.
+
+To release: bump `VERSION` in a PR and merge it, then tag that commit on `master`: `git tag v0.3.0 && git push origin v0.3.0`. `.github/workflows/release.yml` re-runs the tests, fails if the tag doesn't equal `v` + `VERSION`, builds Linux x86_64 (fully static) and macOS arm64 (static libgfortran/libgcc/libquadmath) binaries, and publishes a GitHub Release with notes generated from merged PRs. PRs that edit `release.yml` run the build jobs without publishing.
+
 ## Source layout
 
 - `TicTac.f` — the whole game. **Fixed-form Fortran**: code starts at column 7, `c` in column 1 is a comment, continuation lines have `+` in column 6, and anything past column 72 is ignored. Keep long string literals split with `+` continuations as the existing code does.

@@ -1,7 +1,7 @@
 ! **********************************************************************
 !   Program Name:       Tic-Tac-Tran
 !   Author:             Ryan Romanosky
-!   Version No.:        0.1
+!   Version No.:        see VERSION below (released as git tag vX.Y.Z)
 !
 !
 !
@@ -25,9 +25,12 @@
 !                       counter     (keeps track of turns)
 !                       diff        (difficulty setting)
 !                       retire      (used to quit program)
+!                       VERSION     (release version, see CLAUDE.md)
 !-----------------------------------------------------------------------
       program tictactran
         implicit none
+c   Release version; must match the git tag (vX.Y.Z) when releasing
+        character(len=*), parameter :: VERSION = '0.2.0'
 c   main board array
         character, dimension(3,3) :: board = '_'
 
@@ -41,14 +44,22 @@ c        integer :: vRows = 24, vCols = 3
 
 c        integer, dimension(24,3) :: vBoard
         character(len=3) :: retire = 'no'
+        character(len=16) :: arg
 c        call BoardLoader(r,c,vRows,vCols,vBoard)
 
 
 
 
+c   "tictac --version" prints the version and exits
+        call get_command_argument(1, arg)
+        if ( arg .eq. '--version' ) then
+          write(*,'(A)') VERSION
+          stop
+        end if
+
 c   Seed the random number generator once, differently on each run
         call random_init(.false., .false.)
-        call Menu(diff)
+        call Menu(diff, VERSION)
         do while (retire .ne. 'yes' .and. victor .eq. 0)
           call PrintBoard(board, rows, cols, r, c)
 
@@ -87,9 +98,10 @@ c   Seed the random number generator once, differently on each run
 
 
 c Subroutine for Menu display & gets difficulty level
-      subroutine Menu(diff)
+      subroutine Menu(diff, ver)
         integer :: diff
-        write(*,*) "Welcome to Tic-Tak-Tran!"
+        character(len=*) :: ver
+        write(*,*) "Welcome to Tic-Tak-Tran! (v", ver, ")"
         write(*,*) "This Fortran-based emulator is the most accurate and
      + "
         write(*,*) "graphically advanced way to play the game known for

@@ -68,6 +68,22 @@ class SourceFormat(unittest.TestCase):
         self.assertEqual(long_lines, [])
 
 
+class Version(unittest.TestCase):
+    def test_version_flag_prints_semver(self):
+        p = subprocess.run(
+            [BIN, "--version"], capture_output=True, text=True, timeout=TIMEOUT
+        )
+        self.assertEqual(p.returncode, 0)
+        self.assertRegex(p.stdout, r"^\d+\.\d+\.\d+\n$")
+
+    def test_banner_shows_version(self):
+        version = subprocess.run(
+            [BIN, "--version"], capture_output=True, text=True, timeout=TIMEOUT
+        ).stdout.strip()
+        _, out = play(1, RETIRE, "yes\n")
+        self.assertIn(f"(v{version})", out)
+
+
 class Input(unittest.TestCase):
     def test_board_prints_and_retire_quits(self):
         outcome, out = play(1, RETIRE, "yes\n")
