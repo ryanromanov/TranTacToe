@@ -112,10 +112,10 @@ c Subroutine for Menu display & gets difficulty level
         write(*,*) 'Please choose your difficulty level'
         write(*,*) '(1 being greenhorn, 2 being leftenant, 3 being Navy
      +Seal Copy Pasta)'
-        read(*,*) diff
+        call ReadInt(diff)
           do while (diff .lt. 1 .or. diff .gt. 3)
             write(*,*) 'Error: Please choose a number between 1 and 3'
-            read(*,*) diff
+            call ReadInt(diff)
           end do
         write(*,*) "Fight!"
       end subroutine menu
@@ -144,6 +144,7 @@ c Subroutine to get User coördinates
         character, dimension(3,3) :: b
         integer :: tempX, tempY
         character(len=3) :: ret
+        integer :: ios
         tempX = -1
         tempY = -1
         x = 0
@@ -154,7 +155,7 @@ c Subroutine to get User coördinates
         write(*,*) 'Coordinates are 1-indexed and the top-left corner is
      + 1,1'
         write(*,*) '( To retire, enter 0 0 )'
-        read(*,*) tempX,tempY
+        call ReadPair(tempX,tempY)
         do while ((x .eq. 0 .or. y .eq. 0) .and. ret .ne. 'yes' )
           if ( tempX .gt. 0 .and. tempX .lt. 4 ) then
             if ( tempY .gt. 0 .and. tempY .lt. 4 ) then
@@ -165,30 +166,60 @@ c Subroutine to get User coördinates
               else
                 call OverLaid(tempX, tempY, b)
                 write(*,*) 'Please re-enter your x- and y-coordinates:'
-                read(*,*) tempX,tempY
+                call ReadPair(tempX,tempY)
               end if
             else
               write(*,*) 'Error: your y-coordinates are wrong'
               write(*,*) 'Please re-enter your x- and y-coordinates:'
-              read(*,*) tempX,tempY
+              call ReadPair(tempX,tempY)
             end if
           else if (tempX .eq. 0 .and. tempY .eq. 0) then
             write(*,*) 'Are you sure you want to retire? Enter "yes" to
      +retire or anything else to continue.'
-            read(*,*) ret
+            read(*,*,iostat=ios) ret
+            if ( ios .lt. 0 ) call EndOfInput()
             if ( ret .eq. 'yes' ) then
               call OAP()
             else
               write(*,*) 'Please enter your x- and y-coordinates:'
-              read(*,*) tempX,tempY
+              call ReadPair(tempX,tempY)
             end if
           else
             write(*,*) 'Error: your x-coordinates are wrong'
             write(*,*) 'Please re-enter your x- and y-coordinates:'
-            read(*,*) tempX,tempY
+            call ReadPair(tempX,tempY)
           end if
         end do
       end subroutine GetPos
+c Subroutine to read one integer, re-asking until the input is a number
+      subroutine ReadInt(n)
+        integer :: n, ios
+        read(*,*,iostat=ios) n
+        do while (ios .ne. 0)
+          if ( ios .lt. 0 ) call EndOfInput()
+          write(*,*) 'Error: please enter a whole number'
+          read(*,*,iostat=ios) n
+        end do
+      end subroutine ReadInt
+
+c Subroutine to read two integers, re-asking until both are numbers
+      subroutine ReadPair(a, b)
+        integer :: a, b, ios
+        read(*,*,iostat=ios) a, b
+        do while (ios .ne. 0)
+          if ( ios .lt. 0 ) call EndOfInput()
+          write(*,*) 'Error: please enter two whole numbers, like "2 3"'
+          read(*,*,iostat=ios) a, b
+        end do
+      end subroutine ReadPair
+
+c Subroutine to quit cleanly when input ends (Ctrl-D or end of a pipe)
+      subroutine EndOfInput()
+        write(*,*)
+        write(*,*) 'No more input. Quitting program...'
+        stop
+      end subroutine EndOfInput
+
 c Indented Subroutine to quit
           subroutine OAP()
             write(*,*) 'Quitting program...'

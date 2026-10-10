@@ -37,6 +37,7 @@ The main program loops until the user retires or `victor` is non-zero:
 `Menu` (pick difficulty 1–3) → loop { `PrintBoard` → `GetPos` (read/validate user move, increments turn `counter`) → `MarkBoard` → `VCheck` (only once `counter >= 3`) → `Sonny` (computer move) → `VCheck` } → end message + `Turing` (random quote).
 
 - Board is `character board(3,3)`, empty cells are `'_'`. User input `x y` maps to `board(x,y)` i.e. **x = row, y = column**.
+- Read numbers through `ReadInt` / `ReadPair`, never a bare `read(*,*)`: they re-prompt on non-numeric input and call `EndOfInput` (clean quit) when stdin ends.
 - `victor` codes: `0` none, `1` user (X), `2` computer (O), `3` tie. `VCheck` sets it via the `VReturn` function.
 - `Sonny` is the AI, with one block per difficulty (comments quote Asimov's Three Laws):
   - `diff == 1`: random empty cell.
