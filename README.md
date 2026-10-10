@@ -4,17 +4,9 @@ Tic-Tac-Tran: tic-tac-toe in your terminal, written in Fortran. You play `X`
 against the computer's `O`, at one of three difficulty levels. The hardest one
 can't be beaten.
 
-```
-  ----- ----- -----
- |  O  |  _  |  _  |
-  ----- ----- -----
-  ----- ----- -----
- |  _  |  X  |  _  |
-  ----- ----- -----
-  ----- ----- -----
- |  _  |  _  |  _  |
-  ----- ----- -----
-```
+<p align="center">
+  <img src="docs/terminal.svg" width="340" alt="A game of TranTacToe in a terminal window: the computer, playing O, is one move from winning on the diagonal">
+</p>
 
 ## Download
 
