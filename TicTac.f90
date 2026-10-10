@@ -432,7 +432,7 @@ program tictactran
   use game
   implicit none
   ! Release version; must match the git tag (vX.Y.Z) when releasing
-  character(len=*), parameter :: VERSION = '0.2.1'
+  character(len=*), parameter :: VERSION = '0.2.2'
   ! main board array
   character, dimension(3,3) :: board = '_'
 
