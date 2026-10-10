@@ -272,27 +272,60 @@ end function Wins
 subroutine BestMove(b, y, z)
   character, dimension(3,3), intent(inout) :: b
   integer, intent(out) :: y, z
-  integer :: r, c, s, best
+  integer, dimension(3,3) :: s
+  integer :: r, c, best, n, most
   logical :: found
   ! Take an immediate win rather than any equally-scored slower one
   call FindLine(b, "O", y, z, found)
   if ( found ) return
+  ! Pass 1: score every move
   best = -2
   do r = 1, 3
     do c = 1, 3
       if ( b(r,c) .eq. "_" ) then
         b(r,c) = "O"
-        s = Score(b, "X")
+        s(r,c) = Score(b, "X")
         b(r,c) = "_"
-        if ( s .gt. best ) then
-          best = s
-          y = r
-          z = c
+        best = max(best, s(r,c))
+      end if
+    end do
+  end do
+  ! Pass 2: among the best-scored moves only (so play stays perfect),
+  ! pick the one that leaves the user the most losing replies
+  most = -1
+  do r = 1, 3
+    do c = 1, 3
+      if ( b(r,c) .eq. "_" ) then
+        if ( s(r,c) .eq. best ) then
+          b(r,c) = "O"
+          n = Traps(b)
+          b(r,c) = "_"
+          if ( n .gt. most ) then
+            most = n
+            y = r
+            z = c
+          end if
         end if
       end if
     end do
   end do
 end subroutine BestMove
+
+! Function to count the user's replies after which O wins by force
+integer function Traps(b)
+  character, dimension(3,3), intent(inout) :: b
+  integer :: r, c
+  Traps = 0
+  do r = 1, 3
+    do c = 1, 3
+      if ( b(r,c) .eq. "_" ) then
+        b(r,c) = "X"
+        if ( Score(b, "O") .eq. 1 ) Traps = Traps + 1
+        b(r,c) = "_"
+      end if
+    end do
+  end do
+end function Traps
 
 ! Function to score board b with mark to move: 1 O wins, -1 X wins, 0 tie
 recursive integer function Score(b, mark) result(best)

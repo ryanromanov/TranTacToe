@@ -151,27 +151,38 @@ class Games(unittest.TestCase):
         self.assert_finishes(2, [(1, 3)] + RETIRE, "yes\n", {"quit"})
 
     def test_difficulty_3_never_loses(self):
-        # Difficulty 3 is deterministic, so explore every user move sequence.
+        # Difficulty 3 is deterministic, so explore every user move sequence,
+        # weighting each by its chance if the user picked cells at random.
         tally = {}
-        frontier = [[]]
+        computer_wins = 0.0
+        frontier = [([], 1.0)]
         with ThreadPoolExecutor() as pool:
             while frontier:
                 results = pool.map(
-                    lambda m: (m, play(3, m + RETIRE, "yes\n")), frontier
+                    lambda f: (f, play(3, f[0] + RETIRE, "yes\n")), frontier
                 )
                 frontier = []
-                for moves, (outcome, out) in results:
+                for (moves, chance), (outcome, out) in results:
                     if outcome == "quit":
                         board = last_board(out)
-                        frontier += [
-                            moves + [(r, c)] for r, c in ALL_CELLS
+                        empty = [
+                            (r, c) for r, c in ALL_CELLS
                             if board[r - 1][c - 1] == "_"
+                        ]
+                        frontier += [
+                            (moves + [cell], chance / len(empty))
+                            for cell in empty
                         ]
                     else:
                         tally[outcome] = tally.get(outcome, 0) + 1
                         self.assertNotEqual(outcome, "user_win", moves)
                         self.assertIn(outcome, ("computer_win", "tie"), moves)
+                        if outcome == "computer_win":
+                            computer_wins += chance
         self.assertTrue(tally)  # the tree was actually explored
+        # Among equally good moves it sets traps: it beats a random player
+        # 88.0% of the time (80.6% when it took the first best move).
+        self.assertGreater(computer_wins, 0.88)
 
 
 if __name__ == "__main__":

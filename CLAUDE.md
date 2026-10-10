@@ -18,7 +18,7 @@ python3 tests/test_game.py                                  # build (warnings ar
 python3 tests/test_game.py Input.test_declining_retire_resumes_game   # one test
 ```
 
-The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any line over 132 characters (the standard free-form limit). Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence.
+The tests drive the game over stdin (difficulty, then moves as `row col`; `0 0` + `yes` retires) and classify the outcome from its output. They also fail on any line over 132 characters (the standard free-form limit). Random difficulties are run 20 times per test; difficulty 3 is checked against every possible user move sequence: it must never lose, and must beat a uniformly random player more than 88% of the time.
 
 ## Versioning & releases
 
@@ -42,7 +42,7 @@ The main program loops until the user retires or `victor` is non-zero:
 - `Sonny` is the AI, with one block per difficulty (comments quote Asimov's Three Laws):
   - `diff == 1`: random empty cell.
   - `diff == 2`: completes its own line, else blocks the user's (`FindLine`), else random.
-  - `diff == 3`: full minimax search (`BestMove` → recursive `Score`); deterministic and unbeatable.
+  - `diff == 3`: full minimax search (`BestMove` → recursive `Score`); deterministic and unbeatable. Among equally scored moves, `BestMove` picks the one leaving the user the most losing replies (`Traps`).
   - The 8 winning lines live in one table in `ScanLine`; `FindLine`, `Wins` and `VCheck` are built on it.
   - `Sonny` assumes at least one empty cell; the main loop only calls it while `victor == 0`.
 - Subroutines take the board as an explicit `character b(3,3)` argument, and every dummy argument has an `intent`.
