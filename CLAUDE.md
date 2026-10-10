@@ -29,7 +29,7 @@ To release: bump `VERSION` in a PR and merge it, then tag that commit on `master
 ## Source layout
 
 - `TicTac.f90` — the whole game, free-form Fortran (`!` comments, `&` at line end to continue). Split long messages with `"..." // &` so lines stay within 132 characters.
-- `ticTacScratch.f90` — scratch/experimental `BoardLoader` subroutine (a 24×3 win-pattern table). It is not linked into the game; the call to it in `TicTac.f90` is commented out.
+- `docs/history/board-loader.md` — the original 2017 scratch `BoardLoader` code, kept for history. It is not part of the build.
 
 ## Architecture (TicTac.f90)
 
