@@ -100,7 +100,7 @@ end program tictactran
 subroutine Menu(diff, ver)
   integer :: diff
   character(len=*) :: ver
-  write(*,*) "Welcome to Tic-Tak-Tran! (v", ver, ")"
+  write(*,*) "Welcome to Tic-Tac-Tran! (v", ver, ")"
   write(*,*) "This Fortran-based emulator is the most accurate and "
   write(*,*) "graphically advanced way to play the game known for its ability " // &
              "to render even the most expensive GPUs into a molten pile of " // &
