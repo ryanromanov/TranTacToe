@@ -64,7 +64,7 @@ c        call BoardLoader(r,c,vRows,vCols,vBoard)
               call MarkBoard(x,y,board)
               call VCheck(board, rows, cols, victor)
               print*, 'Victor: ', victor
-              if ( victor .ne. 3 ) then
+              if ( victor .eq. 0 ) then
                 call Sonny(board, rows, cols,diff)
                 call VCheck(board, rows, cols, victor)
               end if
