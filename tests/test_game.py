@@ -92,6 +92,13 @@ class Input(unittest.TestCase):
         self.assertEqual(outcome, "quit")
         self.assertIn("|  _  |  _  |  _  |", out)
 
+    def test_retire_accepts_any_case(self):
+        for answer in ("YES", "Yes"):
+            with self.subTest(answer=answer):
+                outcome, out = play(1, RETIRE, answer + "\n")
+                self.assertEqual(outcome, "quit")
+                self.assertNotIn("No more input", out)
+
     def test_declining_retire_resumes_game(self):
         outcome, out = play(1, RETIRE, "no\n1 1\n0 0\nyes\n")
         self.assertEqual(outcome, "quit")

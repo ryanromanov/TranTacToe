@@ -90,6 +90,7 @@ subroutine GetPos(x,y,c, ret,b)
                  'or anything else to continue.'
       read(*,*,iostat=ios) ret
       if ( ios .lt. 0 ) call EndOfInput()
+      call Lower(ret)
       if ( ret .eq. 'yes' ) then
         call OAP()
       else
@@ -133,6 +134,17 @@ subroutine EndOfInput()
   write(*,*) 'No more input. Quitting program...'
   stop
 end subroutine EndOfInput
+
+! Subroutine to lowercase s in place, so "YES" and "Yes" match "yes"
+subroutine Lower(s)
+  character(len=*), intent(inout) :: s
+  integer :: i
+  do i = 1, len(s)
+    if ( s(i:i) .ge. 'A' .and. s(i:i) .le. 'Z' ) then
+      s(i:i) = achar(iachar(s(i:i)) + 32)
+    end if
+  end do
+end subroutine Lower
 
 ! Subroutine to quit when the user retires
 subroutine OAP()
