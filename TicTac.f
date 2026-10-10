@@ -126,7 +126,7 @@ c Subroutine to print tic-tac-toe board
           write(*,2)
         end do
         write(*,*)
-  1   format(' ', "|",XX,A,XX,"|",XX,A,XX,"|",XX,A,XX,"|")
+  1   format(' ', "|",2X,A,2X,"|",2X,A,2X,"|",2X,A,2X,"|")
   2   format(' ',  X,5("-"),X,5("-"),X,5("-"))
       end subroutine PrintBoard
 
