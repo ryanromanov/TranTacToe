@@ -24,8 +24,6 @@
 !                       victor      (determines victor of match)
 !                       counter     (keeps track of turns)
 !                       diff        (difficulty setting)
-!                       values      (used for random_seed)
-!                       seed        (used to store random seed)
 !                       retire      (used to quit program)
 !-----------------------------------------------------------------------
       program tictactran
@@ -41,9 +39,6 @@ c        integer :: vRows = 24, vCols = 3
         integer :: counter = 0
         integer :: diff = 0
 
-        integer, dimension(8) :: values
-        integer :: seed
-
 c        integer, dimension(24,3) :: vBoard
         character(len=3) :: retire = 'no'
 c        call BoardLoader(r,c,vRows,vCols,vBoard)
@@ -51,6 +46,8 @@ c        call BoardLoader(r,c,vRows,vCols,vBoard)
 
 
 
+c   Seed the random number generator once, differently on each run
+        call random_init(.false., .false.)
         call Menu(diff)
         do while (retire .ne. 'yes' .and. victor .eq. 0)
           call PrintBoard(board, rows, cols, r, c)
@@ -215,18 +212,6 @@ c   "The Three Laws will lead to only one logical outcome."
         integer :: diff
         real :: rando
         logical :: found
-        integer :: i_seed
-        integer, dimension(:), allocatable :: a_seed
-        integer, dimension(1:8) :: dt_seed
-c Stack used to randomly seed the pseudorandom sequence from rand num gen
-        call random_seed(size=i_seed)
-        allocate(a_seed(1:i_seed))
-        call random_seed(get=a_seed)
-        call date_and_time(values=dt_seed)
-        a_seed(i_seed)=dt_seed(8)
-        a_seed(1)=dt_seed(8)*dt_seed(7)*dt_seed(6)
-        call random_seed(put=a_seed)
-        deallocate(a_seed)
 
         found = .false.
 c   "A robot may not harm a human or, by inaction, allow a human being
